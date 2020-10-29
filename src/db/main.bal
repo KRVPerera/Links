@@ -43,6 +43,7 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
     } else if (result is sql:Error) {
         log:printError("Error occurred: ", result);
     }
+    sql:Error? errorOut = addDefaultLinksTable(linksDBClient);
 
     return linksDBClient;
 }
@@ -50,24 +51,31 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
 public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json {
     sql:ParameterizedQuery query = `select * from Links`;
     if (jdbcClient is jdbc:Client) {
-        sql:ExecutionResult|sql:Error result = jdbcClient->executeQuery(query);
+        stream<record { }, error> resultStream = jdbcClient->query(query);
 
-        if (result is sql:ExecutionResult) {
-            log:printDebug(result?.affectedRowCount);
-            log:printDebug(result);
-            json js = {};
-            json j8 = checkpanic js.mergeJson(result?.affectedRowCount);
-            return result?.affectedRowCount.toJsonString();
-        } else {
-            log:printError("Error occurred: ", result);
+        error? e = resultStream.forEach(function(record { } result) {
+                                            log:printDebug("Print result");
+                                            log:printDebug(result);
+                                            // io:println("Customer first name: ", result["FIRSTNAME"]);
+                                            // io:println("Customer last name: ", result["LASTNAME"]);
+                                        });
+
+        if (e is error) {
+            log:printError("ForEach operation on the stream failed!", e);
         }
+
     }
     return ();
 }
 
 function initializeLinksTable(jdbc:Client jdbcClient) returns int|string|sql:Error? {
     sql:ExecutionResult result = check jdbcClient->execute("CREATE TABLE IF NOT EXISTS Links" + 
-    "(linkId INTEGER NOT NULL IDENTITY, linkName VARCHAR(300), " + "linkPath VARCHAR(300), PRIMARY KEY (linkId))");
+    "(linkName VARCHAR(300) NOT NULL, " + "linkPath VARCHAR(300), PRIMARY KEY (linkName))");
+}
+
+function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
+    sql:ExecutionResult result = check jdbcClient->execute("INSERT INTO Links (linkName," +
+        "linkPath) VALUES ('Me', 'https://github.com/KRVPerera')");
 }
 
 function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, string linkName) {

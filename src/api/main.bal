@@ -18,7 +18,6 @@ service contentBasedRouting on new http:Listener(9090) {
     }
     resource function cbrResource(http:Caller outboundEP, http:Request req) {
         var jsonMsg = req.getJsonPayload();   
-
         if (jsonMsg is json) {
             json|error nameString = jsonMsg.name;
             http:Response|http:Payload|error response;
@@ -26,6 +25,8 @@ service contentBasedRouting on new http:Listener(9090) {
                 if (nameString.toString() == "all") {
                     http:Response res = new;
                     res.statusCode = 200;
+
+                    log:printDebug("Hit all request");
                     
                     if (linkdDbClient is jdbc:Client) {
                         json queryResult = db:getAllRecord(linkdDbClient);
