@@ -18,10 +18,10 @@ service contentBasedRouting on new http:Listener(9090) {
     }
     resource function allResource(http:Caller outboundEP, http:Request req) {
         var jsonMsg = req.getJsonPayload();
-        
         if (jsonMsg is json) {
             log:printDebug(jsonMsg);
             json|error nameString = jsonMsg.name;
+            
             http:Response|http:Payload|error response;
             if (nameString is json) {
                 if (nameString.toString() == "all") {
@@ -29,14 +29,12 @@ service contentBasedRouting on new http:Listener(9090) {
                     res.statusCode = 200;
 
                     log:printDebug("Hit all request");
-                    
+
                     if (linkdDbClient is jdbc:Client) {
-                        json|error queryResult = db:getAllRecord(linkdDbClient);
-                        if (queryResult is json) {
-                            log:printDebug("RECIEVED data from DB");
-                            log:printDebug(queryResult);
-                            res.setPayload(queryResult);
-                        }
+                        json[] queryResult = db:getAllRecord(linkdDbClient);
+                        log:printDebug("RECIEVED data from DB");
+                        log:printDebug(queryResult);
+                        res.setPayload(queryResult);
                     }
 
                     var result = outboundEP->respond(res);
@@ -56,7 +54,8 @@ service contentBasedRouting on new http:Listener(9090) {
             } else {
                 http:Response res = new;
                 res.statusCode = 500;
-                res.setPayload(<@untainted>nameString.message());                var result = outboundEP->respond(res);
+                res.setPayload(<@untainted>nameString.message());                
+                var result = outboundEP->respond(res);
                 if (result is error) {
                     log:printError("Error sending response", result);
                 }
@@ -64,7 +63,8 @@ service contentBasedRouting on new http:Listener(9090) {
         } else {
             http:Response res = new;
             res.statusCode = 500;
-            res.setPayload(<@untainted>jsonMsg.message());            var result = outboundEP->respond(res);
+            res.setPayload(<@untainted>jsonMsg.message());            
+            var result = outboundEP->respond(res);
             if (result is error) {
                 log:printError("Error sending response", result);
             }
