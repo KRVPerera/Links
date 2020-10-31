@@ -48,7 +48,8 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
     return linksDBClient;
 }
 
-public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json {
+public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json|error {
+    json|error output = ();
     sql:ParameterizedQuery query = `select * from Links`;
     if (jdbcClient is jdbc:Client) {
         stream<record { }, error> resultStream = jdbcClient->query(query);
@@ -56,8 +57,11 @@ public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json {
         error? e = resultStream.forEach(function(record { } result) {
                                             log:printDebug("Print result");
                                             log:printDebug(result);
-                                            // io:println("Customer first name: ", result["FIRSTNAME"]);
-                                            // io:println("Customer last name: ", result["LASTNAME"]);
+                                            output = result.cloneWithType(json);
+                                            if (output is json) {
+                                                log:printDebug("Print JSON result");
+                                                log:printDebug(output);
+                                            }
                                         });
 
         if (e is error) {
@@ -65,7 +69,7 @@ public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json {
         }
 
     }
-    return ();
+    return output;
 }
 
 function initializeLinksTable(jdbc:Client jdbcClient) returns int|string|sql:Error? {

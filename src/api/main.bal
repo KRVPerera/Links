@@ -16,9 +16,11 @@ service contentBasedRouting on new http:Listener(9090) {
         methods: ["POST"],
         path: "/all"
     }
-    resource function cbrResource(http:Caller outboundEP, http:Request req) {
-        var jsonMsg = req.getJsonPayload();   
+    resource function allResource(http:Caller outboundEP, http:Request req) {
+        var jsonMsg = req.getJsonPayload();
+        
         if (jsonMsg is json) {
+            log:printDebug(jsonMsg);
             json|error nameString = jsonMsg.name;
             http:Response|http:Payload|error response;
             if (nameString is json) {
@@ -29,8 +31,12 @@ service contentBasedRouting on new http:Listener(9090) {
                     log:printDebug("Hit all request");
                     
                     if (linkdDbClient is jdbc:Client) {
-                        json queryResult = db:getAllRecord(linkdDbClient);
-                        res.setPayload(queryResult);
+                        json|error queryResult = db:getAllRecord(linkdDbClient);
+                        if (queryResult is json) {
+                            log:printDebug("RECIEVED data from DB");
+                            log:printDebug(queryResult);
+                            res.setPayload(queryResult);
+                        }
                     }
 
                     var result = outboundEP->respond(res);
