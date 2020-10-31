@@ -43,6 +43,7 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
     } else if (result is sql:Error) {
         log:printError("Error occurred: ", result);
     }
+    // log:printDebug(result);
     sql:Error? errorOut = addDefaultLinksTable(linksDBClient);
 
     return linksDBClient;
@@ -73,14 +74,16 @@ public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json[] {
 
 function initializeLinksTable(jdbc:Client jdbcClient) returns int|string|sql:Error? {
     sql:ExecutionResult result = check jdbcClient->execute("CREATE TABLE IF NOT EXISTS Links" + 
-    "(linkName VARCHAR(300) NOT NULL, linkPath VARCHAR(300), groupName VARCHAR(300), PRIMARY KEY (linkName))");
+    "(linkID INTEGER NOT NULL IDENTITY, linkName VARCHAR(300) NOT NULL UNIQUE, linkPath VARCHAR(300)," + 
+    "groupName VARCHAR(300), PRIMARY KEY (linkID))");
 }
 
 function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
-    sql:ExecutionResult result = check jdbcClient->execute("INSERT INTO Links (linkName," +
-        "linkPath, groupName) VALUES ('Me', 'https://github.com/KRVPerera', 'daily_use')");
-    result = check jdbcClient->execute("INSERT INTO Links (linkName," +
-        "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera', 'daily_use')");
+    sql:ExecutionResult result = check jdbcClient->execute("INSERT INTO Links (linkName," + 
+    "linkPath, groupName) VALUES ('Me', 'https://github.com/KRVPerera', 'daily_use')");
+    result = check jdbcClient->execute(
+    "INSERT INTO Links (linkName," + 
+    "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issåues/assigned/KRVPerera', 'daily_use')");
 }
 
 function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, string linkName) {

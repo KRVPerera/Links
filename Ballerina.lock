@@ -85,6 +85,16 @@ version = "1.0.1"
 
 [[imports."rukshanp/db:0.1.0"]]
 org_name = "ballerina"
+name = "io"
+version = "0.5.1"
+
+[[imports."rukshanp/db:0.1.0"]]
+org_name = "ballerina"
+name = "log"
+version = "1.0.1"
+
+[[imports."rukshanp/db:0.1.0"]]
+org_name = "ballerina"
 name = "java.jdbc"
 version = "0.5.1"
 
@@ -92,11 +102,6 @@ version = "0.5.1"
 org_name = "ballerina"
 name = "sql"
 version = "0.5.1"
-
-[[imports."rukshanp/db:0.1.0"]]
-org_name = "ballerina"
-name = "log"
-version = "1.0.1"
 
 [[imports."ballerina/auth:1.0.1"]]
 org_name = "ballerina"
