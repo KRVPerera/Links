@@ -10,7 +10,7 @@ jdbc:Client|sql:Error linkdDbClient = db:getLinksDbClient();
 @http:ServiceConfig {
     basePath: "/links",
     cors: {
-            allowOrigins: ["*", "http://localhost:3000"]
+            allowOrigins: ["http://localhost:3000", "http://www.krvperera.com/WFHManager/"]
         }
 }
 service contentBasedRouting on new http:Listener(9090) {
@@ -19,7 +19,7 @@ service contentBasedRouting on new http:Listener(9090) {
         methods: ["POST"],
         path: "/all",
         cors: {
-            allowOrigins: ["*", "http://localhost:3000"]
+            allowOrigins: ["http://localhost:3000", "http://www.krvperera.com/WFHManager/"]
         }
     }
     resource function allResource(http:Caller outboundEP, http:Request req) {
