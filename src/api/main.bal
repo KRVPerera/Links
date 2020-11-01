@@ -8,20 +8,26 @@ import ballerina/log;
 jdbc:Client|sql:Error linkdDbClient = db:getLinksDbClient();
 
 @http:ServiceConfig {
-    basePath: "/links"
+    basePath: "/links",
+    cors: {
+            allowOrigins: ["*", "http://localhost:3000"]
+        }
 }
 service contentBasedRouting on new http:Listener(9090) {
 
     @http:ResourceConfig {
         methods: ["POST"],
-        path: "/all"
+        path: "/all",
+        cors: {
+            allowOrigins: ["*", "http://localhost:3000"]
+        }
     }
     resource function allResource(http:Caller outboundEP, http:Request req) {
         var jsonMsg = req.getJsonPayload();
         if (jsonMsg is json) {
             log:printDebug(jsonMsg);
             json|error nameString = jsonMsg.name;
-            
+
             http:Response|http:Payload|error response;
             if (nameString is json) {
                 if (nameString.toString() == "all") {
