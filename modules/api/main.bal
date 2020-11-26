@@ -1,7 +1,7 @@
 import ballerina/http;
 import ballerina/jdbc;
 import ballerina/sql;
-import rukshanp/db;
+import rukshanp/Links.db;
 import ballerina/log;
 
 
