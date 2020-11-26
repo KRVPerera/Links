@@ -1,5 +1,5 @@
 import ballerina/http;
-import ballerina/java.jdbc;
+import ballerina/jdbc;
 import ballerina/sql;
 import rukshanp/db;
 import ballerina/log;
