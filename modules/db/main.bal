@@ -49,7 +49,7 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
     return linksDBClient;
 }
 
-public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json[] {
+public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
     json[] output = [];
     sql:ParameterizedQuery query = `select * from Links`;
     if (jdbcClient is jdbc:Client) {
@@ -60,14 +60,13 @@ public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json[] {
                                             if (jsonOrError is json) {
                                                 output.push(jsonOrError);
                                                 log:print("Print JSON result");
-                                                log:print(output);
+                                                log:print(output.toString());
                                             }
                                         });
 
         if (e is error) {
-            log:printError("ForEach operation on the stream failed!", e);
+            log:printError("ForEach operation on the stream failed!", err = e);
         }
-
     }
     return output;
 }
@@ -94,9 +93,9 @@ function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, 
     sql:ExecutionResult|sql:Error result = jdbcClient->execute(updateQuery);
 
     if (result is sql:ExecutionResult) {
-        log:printDebug(result?.affectedRowCount);
+        log:print(result?.affectedRowCount.toString());
     } else {
-        log:printError("Error occurred: ", result);
+        log:printError("Error occurred: ", err = result);
     }
 }
 
@@ -105,9 +104,9 @@ function deleteRecord(jdbc:Client jdbcClient, int generatedId) {
     sql:ExecutionResult|sql:Error result = jdbcClient->execute(deleteQuery);
 
     if (result is sql:ExecutionResult) {
-        log:printDebug("Deleted Row count: " + result.affectedRowCount.toString());
+        log:print("Deleted Row count: " + result.affectedRowCount.toString());
     } else {
-        log:printError("Error occurred: ", result);
+        log:printError("Error occurred: ", err =result);
     }
 }
 
@@ -115,8 +114,8 @@ public function main() {
     sql:Error? err = initializeLinksDb();
 
     if (err is sql:Error) {
-        log:printError("Error occurred, initialization failed!", err);
+        log:printError("Error occurred, initialization failed!", err = err);
     } else {
-        log:printDebug("Sample executed successfully!");
+        log:print("Sample executed successfully!");
     }
 }
