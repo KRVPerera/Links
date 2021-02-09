@@ -1,5 +1,5 @@
 import ballerina/http;
-import ballerina/jdbc;
+import ballerinax/java.jdbc as jdbc;
 import ballerina/sql;
 import rukshanp/Links.db;
 import ballerina/log;
@@ -34,12 +34,12 @@ service contentBasedRouting on new http:Listener(9090) {
                     http:Response res = new;
                     res.statusCode = 200;
 
-                    log:printDebug("Hit all request");
+                    log:print("Hit all request");
 
                     if (linkdDbClient is jdbc:Client) {
                         json[] queryResult = db:getAllRecord(linkdDbClient);
-                        log:printDebug("RECIEVED data from DB");
-                        log:printDebug(queryResult);
+                        log:print("RECIEVED data from DB");
+                        // log:print(queryResult);
                         res.setPayload(queryResult);
                     }
 

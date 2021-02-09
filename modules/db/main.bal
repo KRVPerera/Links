@@ -1,4 +1,4 @@
-import ballerina/jdbc;
+import ballerinax/java.jdbc;
 import ballerina/sql;
 import ballerina/log;
 
@@ -18,13 +18,13 @@ function initializeLinksDb() returns sql:Error? {
     jdbc:Client linksDBClient = check new (url = "jdbc:h2:file:./target/linksDB", options = h2options, connectionPool = 
     connPool);
 
-    log:printDebug("JDBC client with optional params created.");
+    log:print("JDBC client with optional params created.");
 
     int|string|sql:Error? result = initializeLinksTable(linksDBClient);
     if (result is int|string) {
-        log:printDebug(result);
+        log:print(result.toBalString());
     } else if (result is sql:Error) {
-        log:printError("Error occurred: ", result);
+        log:printError("Error occurred: ", err = result);
     }
 
     check linksDBClient.close();
@@ -35,13 +35,13 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
     jdbc:Client linksDBClient = check new (url = "jdbc:h2:file:./target/linksDB", options = h2options, connectionPool = 
     connPool);
 
-    log:printDebug("JDBC client with optional params created.");
+    log:print("JDBC client with optional params created.");
 
     int|string|sql:Error? result = initializeLinksTable(linksDBClient);
     if (result is int|string) {
-        log:printDebug(result);
+        log:print(result.toBalString());
     } else if (result is sql:Error) {
-        log:printError("Error occurred: ", result);
+        log:printError("Error occurred: ", err = result);
     }
     // log:printDebug(result);
     sql:Error? errorOut = addDefaultLinksTable(linksDBClient);
@@ -59,8 +59,8 @@ public function getAllRecord(jdbc:Client|sql:Error jdbcClient) returns json[] {
                                             var jsonOrError = result.cloneWithType(json);
                                             if (jsonOrError is json) {
                                                 output.push(jsonOrError);
-                                                log:printDebug("Print JSON result");
-                                                log:printDebug(output);
+                                                log:print("Print JSON result");
+                                                log:print(output);
                                             }
                                         });
 
