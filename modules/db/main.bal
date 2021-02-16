@@ -82,7 +82,7 @@ function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
     "linkPath, groupName) VALUES ('Me', 'https://github.com/KRVPerera', 'daily_use')");
     result = check jdbcClient->execute(
     "INSERT INTO Links (linkName," + 
-    "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issåues/assigned/KRVPerera', 'daily_use')");
+    "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera', 'daily_use')");
 }
 
 function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, string linkName) {
@@ -110,12 +110,12 @@ function deleteRecord(jdbc:Client jdbcClient, int generatedId) {
     }
 }
 
-public function main() {
-    sql:Error? err = initializeLinksDb();
+// public function main() {
+//     sql:Error? err = initializeLinksDb();
 
-    if (err is sql:Error) {
-        log:printError("Error occurred, initialization failed!", err = err);
-    } else {
-        log:print("Sample executed successfully!");
-    }
-}
+//     if (err is sql:Error) {
+//         log:printError("Error occurred, initialization failed!", err = err);
+//     } else {
+//         log:print("Sample executed successfully!");
+//     }
+// }

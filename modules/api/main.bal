@@ -23,7 +23,7 @@ service /links on new http:Listener(8080) {
                     log:print("Hit all request");
 
                     if (linkdDbClient is jdbc:Client) {
-                        json[] queryResult = db:getAllRecord(linkdDbClient);
+                        json[] queryResult = db:getAllRecords(linkdDbClient);
                         log:print("RECIEVED data from DB");
                         // log:print(queryResult);
                         res.setPayload(queryResult);
