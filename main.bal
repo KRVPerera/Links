@@ -8,6 +8,7 @@ import ballerina/sql;
 jdbc:Client|sql:Error linkdDbClient = db:getLinksDbClient();
 
 public function main() {
+    db:initializeLinksDb();
     io:println("Hello World!");
 }
 
@@ -21,16 +22,10 @@ service /links on new http:Listener(9090) {
     }
 
     @http:ResourceConfig {
-        cors: {allowOrigins: ["*", "http://localhost:3000"]},
+        // cors: {allowOrigins: ["*", "http://localhost:3000"]},
         consumes: ["application/json"]
     }
-    resource function get db(http:Caller caller, http:Request req) {
-        var result = caller->respond("sfs");
-
-        if (result is error) {
-            log:printError("Error sending response from mock service", err = result);  
-        }
-
+    resource function post db(http:Caller caller, http:Request req) {
         var jsonMsg = req.getJsonPayload();
         if (jsonMsg is json) {
             log:print(jsonMsg.toString());
@@ -38,6 +33,7 @@ service /links on new http:Listener(9090) {
 
             http:Response|error response;
             if (nameString is json) {
+                log:print("namestring is json");
                 if (nameString.toString() == "all") {
                     http:Response res = new;
                     res.statusCode = 200;
@@ -47,7 +43,6 @@ service /links on new http:Listener(9090) {
                     if (linkdDbClient is jdbc:Client) {
                         json[] queryResult = db:getAllRecords(linkdDbClient);
                         log:print("RECIEVED data from DB");
-                        // log:print(queryResult);
                         res.setPayload(queryResult);
                     }
 
@@ -81,6 +76,8 @@ service /links on new http:Listener(9090) {
             var result4 = caller->respond(res);
             if (result4 is error) {
                 log:printError("Error sending response", err = result4);
+            } else {
+               log:print("no json pay load"); 
             }
         }
     }

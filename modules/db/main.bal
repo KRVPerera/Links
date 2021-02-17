@@ -13,39 +13,22 @@ sql:ConnectionPool connPool = {
     minIdleConnections: 5
 };
 
-function initializeLinksDb() returns sql:Error? {
+jdbc:Client linksDBClient = check new (url = "jdbc:h2:file:./target/linksDB", options = h2options, connectionPool = 
+connPool);
 
-    jdbc:Client linksDBClient = check new (url = "jdbc:h2:file:./target/linksDB", options = h2options, connectionPool = 
-    connPool);
-
-    log:print("JDBC client with optional params created.");
-
+# This method can be used to add initial DML and DDL to the database
+# + return - Return Value Description  
+public function initializeLinksDb() returns sql:Error? {
     int|string|sql:Error? result = initializeLinksTable(linksDBClient);
     if (result is int|string) {
         log:print(result.toBalString());
     } else if (result is sql:Error) {
         log:printError("Error occurred: ", err = result);
     }
-
     check linksDBClient.close();
 }
 
 public function getLinksDbClient() returns jdbc:Client|sql:Error {
-
-    jdbc:Client linksDBClient = check new (url = "jdbc:h2:file:./target/linksDB", options = h2options, connectionPool = 
-    connPool);
-
-    log:print("JDBC client with optional params created.");
-
-    int|string|sql:Error? result = initializeLinksTable(linksDBClient);
-    if (result is int|string) {
-        log:print(result.toBalString());
-    } else if (result is sql:Error) {
-        log:printError("Error occurred: ", err = result);
-    }
-    // log:printDebug(result);
-    sql:Error? errorOut = addDefaultLinksTable(linksDBClient);
-
     return linksDBClient;
 }
 
@@ -72,17 +55,15 @@ public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
 }
 
 function initializeLinksTable(jdbc:Client jdbcClient) returns int|string|sql:Error? {
-    sql:ExecutionResult result = check jdbcClient->execute("CREATE TABLE IF NOT EXISTS Links" + 
-    "(linkID INTEGER NOT NULL IDENTITY, linkName VARCHAR(300) NOT NULL UNIQUE, linkPath VARCHAR(300)," + 
-    "groupName VARCHAR(300), PRIMARY KEY (linkID))");
+    sql:ExecutionResult result = check jdbcClient->execute(
+    "CREATE TABLE IF NOT EXISTS Links" + "(linkID INTEGER NOT NULL IDENTITY, linkName VARCHAR(300) NOT NULL UNIQUE, linkPath VARCHAR(300)," + "groupName VARCHAR(300), PRIMARY KEY (linkID))");
 }
 
 function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
-    sql:ExecutionResult result = check jdbcClient->execute("INSERT INTO Links (linkName," + 
-    "linkPath, groupName) VALUES ('Me', 'https://github.com/KRVPerera', 'daily_use')");
+    sql:ExecutionResult result = check jdbcClient->execute(
+    "INSERT INTO Links (linkName," + "linkPath, groupName) VALUES ('Me', 'https://github.com/KRVPerera', 'daily_use')");
     result = check jdbcClient->execute(
-    "INSERT INTO Links (linkName," + 
-    "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera', 'daily_use')");
+    "INSERT INTO Links (linkName," + "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera', 'daily_use')");
 }
 
 function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, string linkName) {
@@ -106,16 +87,6 @@ function deleteRecord(jdbc:Client jdbcClient, int generatedId) {
     if (result is sql:ExecutionResult) {
         log:print("Deleted Row count: " + result.affectedRowCount.toString());
     } else {
-        log:printError("Error occurred: ", err =result);
+        log:printError("Error occurred: ", err = result);
     }
 }
-
-// public function main() {
-//     sql:Error? err = initializeLinksDb();
-
-//     if (err is sql:Error) {
-//         log:printError("Error occurred, initialization failed!", err = err);
-//     } else {
-//         log:print("Sample executed successfully!");
-//     }
-// }
