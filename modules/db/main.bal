@@ -1,5 +1,6 @@
 import ballerinax/java.jdbc;
 import ballerina/sql;
+import Links.data;
 import ballerina/log;
 
 jdbc:Options h2options = {
@@ -88,13 +89,28 @@ function initializeLinksTable(jdbc:Client jdbcClient) returns int|string|sql:Err
 # + jdbcClient - Parameter Description
 # + return - Return Value Description  
 function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
-    var result = addLinksToTable(jdbcClient, "Me", "https://github.com/KRVPerera", "daily_use");
-    result = addLinksToTable(jdbcClient, "My Issues", "https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera", "daily_use");
+    data:DataLoader loader = new data:DataLoader();
+    data:Link[]|error? defaultLinks = loader.loadData();
+
+    error|sql:ExecutionResult? result = ();
+    if (defaultLinks is error) {
+        log:printError("Cannot load default data", err = defaultLinks);
+    } else if (defaultLinks is data:Link[]) {
+        foreach var link in defaultLinks {
+            result = addLinksToTable(jdbcClient, link.name, link.path, link.group);
+        }
+        if (result is error) {
+            log:printError("Cannot add data to db", err = result);
+        }
+    } else {
+        log:print("Default links are empty");
+    }
 }
 
 function addLinksToTable(jdbc:Client jdbcClient, string linkName, string link, string group) returns sql:ExecutionResult|error {
-    sql:ExecutionResult|error result = jdbcClient->execute(
-    "INSERT INTO Links (linkName," + "linkPath, groupName) VALUES ('${linkName}'', '${linkName}', '${group}'')");
+    string query =  string `INSERT INTO Links (linkName,linkPath,groupName) VALUES ('${linkName}', '${link}', '${group}')`;
+    // log:print(query);
+    sql:ExecutionResult|error result = jdbcClient->execute(query);
     return result;
 }
 

@@ -12,7 +12,6 @@ function beforeFunc() {
 // io:println("I'm the before function!");
 }
 
-# Test function
 @test:Config {
     before: beforeFunc,
     after: afterFunc
