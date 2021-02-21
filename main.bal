@@ -1,14 +1,21 @@
 import ballerina/io;
 import rukshanp/Links.db as db;
+// import rukshanp/Links.data as data;
 import ballerina/http;
 import ballerina/log;
 import ballerinax/java.jdbc as jdbc;
 import ballerina/sql;
 
+
 jdbc:Client|sql:Error linkdDbClient = db:getLinksDbClient();
 
-public function main() {
-    db:initializeLinksDb();
+public function main() returns error? {
+    var initializeLinksDb = check db:initializeLinksDb();
+    // data:DataLoader loader = new data:DataLoader();
+    // error? loadData = loader.loadData();
+    // if (loadData is error) {
+        // log:print("CSV loading failed");
+    // }
     io:println("Hello World!");
 }
 
@@ -80,5 +87,51 @@ service /links on new http:Listener(9090) {
                log:print("no json pay load"); 
             }
         }
+    }
+
+    @http:ResourceConfig {
+        // cors: {allowOrigins: ["*", "http://localhost:3000"]},
+        consumes: ["application/json"]
+    }
+    resource function post group(http:Caller caller, http:Request req) {
+        var jsonMsg = req.getJsonPayload();
+        if (jsonMsg is json) {
+            log:print(jsonMsg.toString());
+            json|error groupName = jsonMsg.group;
+
+            http:Response|error response;
+            if (groupName is json) {
+                http:Response res = new;
+                
+                log:print("Hit group request");
+
+                if (linkdDbClient is jdbc:Client) {
+                    json[] queryResult = db:getAllRecordsInGroup(linkdDbClient, groupName.toString());
+                    res.statusCode = 200;
+                    res.setPayload(queryResult);
+                }
+
+                var result = caller->respond(res);
+                if (result is error) {
+                    log:printError("Error sending response", err = result);
+                }
+            } else {
+                http:Response res = new;
+                res.statusCode = 500;
+                res.setPayload(<@untainted>groupName.message());                
+                var result = caller->respond(res);
+                if (result is error) {
+                    log:printError("Error sending response", err = result);
+                }
+            }
+        } else {
+            http:Response res = new;
+            res.statusCode = 500;
+            res.setPayload(<@untainted>jsonMsg.message());            
+            var result = caller->respond(res);
+            if (result is error) {
+                log:printError("Error sending response", err = result);
+            }
+        } 
     }
 }

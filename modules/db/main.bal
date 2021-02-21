@@ -25,7 +25,6 @@ public function initializeLinksDb() returns sql:Error? {
     } else if (result is sql:Error) {
         log:printError("Error occurred: ", err = result);
     }
-    check linksDBClient.close();
 }
 
 public function getLinksDbClient() returns jdbc:Client|sql:Error {
@@ -54,22 +53,54 @@ public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
     return output;
 }
 
+public function getAllRecordsInGroup(jdbc:Client|sql:Error jdbcClient, string group) returns json[] {
+    json[] output = [];
+    sql:ParameterizedQuery query = `select * from Links where groupName=${group}`;
+    if (jdbcClient is jdbc:Client) {
+        stream<record { }, error> resultStream = jdbcClient->query(query);
+
+        error? e = resultStream.forEach(function(record { } result) {
+                                            var jsonOrError = result.cloneWithType(json);
+                                            if (jsonOrError is json) {
+                                                output.push(jsonOrError);
+                                                log:print("Print JSON result");
+                                                log:print(output.toString());
+                                            }
+                                        });
+
+        if (e is error) {
+            log:printError("ForEach operation on the stream failed!", err = e);
+        }
+    }
+    return output;
+}
+
 function initializeLinksTable(jdbc:Client jdbcClient) returns int|string|sql:Error? {
     sql:ExecutionResult result = check jdbcClient->execute(
     "CREATE TABLE IF NOT EXISTS Links" + "(linkID INTEGER NOT NULL IDENTITY, linkName VARCHAR(300) NOT NULL UNIQUE, linkPath VARCHAR(300)," + "groupName VARCHAR(300), PRIMARY KEY (linkID))");
+
+    return addDefaultLinksTable(jdbcClient);
 }
 
+
+# Description
+#   TODO need to load data from defined sql files
+# + jdbcClient - Parameter Description
+# + return - Return Value Description  
 function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
-    sql:ExecutionResult result = check jdbcClient->execute(
-    "INSERT INTO Links (linkName," + "linkPath, groupName) VALUES ('Me', 'https://github.com/KRVPerera', 'daily_use')");
-    result = check jdbcClient->execute(
-    "INSERT INTO Links (linkName," + "linkPath, groupName) VALUES ('My Issues', 'https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera', 'daily_use')");
+    var result = addLinksToTable(jdbcClient, "Me", "https://github.com/KRVPerera", "daily_use");
+    result = addLinksToTable(jdbcClient, "My Issues", "https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera", "daily_use");
+}
+
+function addLinksToTable(jdbc:Client jdbcClient, string linkName, string link, string group) returns sql:ExecutionResult|error {
+    sql:ExecutionResult|error result = jdbcClient->execute(
+    "INSERT INTO Links (linkName," + "linkPath, groupName) VALUES ('${linkName}'', '${linkName}', '${group}'')");
+    return result;
 }
 
 function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, string linkName) {
     sql:ParameterizedQuery updateQuery = `Update Links set linkPath = ${linkPath} linkName = ${linkName}
-         where linkId = ${
-    generatedId}`;
+         where linkId = ${generatedId}`;
 
     sql:ExecutionResult|sql:Error result = jdbcClient->execute(updateQuery);
 
