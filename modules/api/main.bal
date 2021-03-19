@@ -11,7 +11,7 @@ service /links on new http:Listener(8080) {
     resource function get all(http:Caller caller, http:Request req) {
                var jsonMsg = req.getJsonPayload();
         if (jsonMsg is json) {
-            log:print(jsonMsg.toString());
+            log:printInfo(jsonMsg.toString());
             json|error nameString = jsonMsg.name;
 
             http:Response|error response;
@@ -20,18 +20,18 @@ service /links on new http:Listener(8080) {
                     http:Response res = new;
                     res.statusCode = 200;
 
-                    log:print("Hit all request");
+                    log:printInfo("Hit all request");
 
                     if (linkdDbClient is jdbc:Client) {
                         json[] queryResult = db:getAllRecords(linkdDbClient);
-                        log:print("RECIEVED data from DB");
+                        log:printInfo("RECIEVED data from DB");
                         // log:print(queryResult);
                         res.setPayload(queryResult);
                     }
 
                     var result = caller->respond(res);
                     if (result is error) {
-                        log:printError("Error sending response", err = result);
+                        log:printError("Error sending response", 'error = result);
                     }
 
                 } else {
@@ -40,7 +40,7 @@ service /links on new http:Listener(8080) {
                     res.setPayload("Invalid request");
                     var result = caller->respond(res);
                     if (result is error) {
-                        log:printError("Error sending response", err = result);
+                        log:printError("Error sending response", 'error = result);
                     }
                 }
             } else {
@@ -49,7 +49,7 @@ service /links on new http:Listener(8080) {
                 res.setPayload(<@untainted>nameString.message());                
                 var result = caller->respond(res);
                 if (result is error) {
-                    log:printError("Error sending response", err = result);
+                    log:printError("Error sending response", 'error = result);
                 }
             }
         } else {
@@ -58,10 +58,8 @@ service /links on new http:Listener(8080) {
             res.setPayload(<@untainted>jsonMsg.message());            
             var result = caller->respond(res);
             if (result is error) {
-                log:printError("Error sending response", err = result);
+                log:printError("Error sending response", 'error = result);
             }
         } 
     }
-
-    
 }

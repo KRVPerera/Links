@@ -10,7 +10,6 @@ jdbc:Options h2options = {
 
 sql:ConnectionPool connPool = {
     maxOpenConnections: 5,
-    maxConnectionLifeTimeInSeconds: 2000.0,
     minIdleConnections: 5
 };
 
@@ -22,9 +21,9 @@ connPool);
 public function initializeLinksDb() returns sql:Error? {
     int|string|sql:Error? result = initializeLinksTable(linksDBClient);
     if (result is int|string) {
-        log:print(result.toBalString());
+        log:printInfo(result.toBalString());
     } else if (result is sql:Error) {
-        log:printError("Error occurred: ", err = result);
+        log:printError("Error occurred: ", 'error = result);
     }
 }
 
@@ -42,13 +41,13 @@ public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
                                             var jsonOrError = result.cloneWithType(json);
                                             if (jsonOrError is json) {
                                                 output.push(jsonOrError);
-                                                log:print("Print JSON result");
-                                                log:print(output.toString());
+                                                log:printInfo("Print JSON result");
+                                                log:printInfo(output.toString());
                                             }
                                         });
 
         if (e is error) {
-            log:printError("ForEach operation on the stream failed!", err = e);
+            log:printError("ForEach operation on the stream failed!", 'error = e);
         }
     }
     return output;
@@ -64,13 +63,13 @@ public function getAllRecordsInGroup(jdbc:Client|sql:Error jdbcClient, string gr
                                             var jsonOrError = result.cloneWithType(json);
                                             if (jsonOrError is json) {
                                                 output.push(jsonOrError);
-                                                log:print("Print JSON result");
-                                                log:print(output.toString());
+                                                log:printInfo("Print JSON result");
+                                                log:printInfo(output.toString());
                                             }
                                         });
 
         if (e is error) {
-            log:printError("ForEach operation on the stream failed!", err = e);
+            log:printError("ForEach operation on the stream failed!", 'error = e);
         }
     }
     return output;
@@ -94,16 +93,16 @@ function addDefaultLinksTable(jdbc:Client jdbcClient) returns sql:Error? {
 
     error|sql:ExecutionResult? result = ();
     if (defaultLinks is error) {
-        log:printError("Cannot load default data", err = defaultLinks);
+        log:printError("Cannot load default data", 'error = defaultLinks);
     } else if (defaultLinks is data:Link[]) {
         foreach var link in defaultLinks {
             result = addLinksToTable(jdbcClient, link.name, link.path, link.group);
         }
         if (result is error) {
-            log:printError("Cannot add data to db", err = result);
+            log:printError("Cannot add data to db", 'error = result);
         }
     } else {
-        log:print("Default links are empty");
+        log:printInfo("Default links are empty");
     }
 }
 
@@ -118,12 +117,12 @@ function updateRecord(jdbc:Client jdbcClient, int generatedId, string linkPath, 
     sql:ParameterizedQuery updateQuery = `Update Links set linkPath = ${linkPath} linkName = ${linkName}
          where linkId = ${generatedId}`;
 
-    sql:ExecutionResult|sql:Error result = jdbcClient->execute(updateQuery);
+    sql:ExecutionResult|sql:Error resultdf = jdbcClient->execute(updateQuery);
 
-    if (result is sql:ExecutionResult) {
-        log:print(result?.affectedRowCount.toString());
+    if (resultdf is sql:ExecutionResult) {
+        log:printInfo(resultdf?.affectedRowCount.toString());
     } else {
-        log:printError("Error occurred: ", err = result);
+        log:printError("Error occurred: ", 'error = resultdf);
     }
 }
 
@@ -132,8 +131,10 @@ function deleteRecord(jdbc:Client jdbcClient, int generatedId) {
     sql:ExecutionResult|sql:Error result = jdbcClient->execute(deleteQuery);
 
     if (result is sql:ExecutionResult) {
-        log:print("Deleted Row count: " + result.affectedRowCount.toString());
+        log:printInfo("Deleted Row count: " + result.affectedRowCount.toString());
     } else {
-        log:printError("Error occurred: ", err = result);
+        log:printError("Error occurred: ", 'error = result);
     }
+
+    object {public isolated function __iterator() returns object {public isolated function next() returns record {| int value; |}? ;} ;} objectResult = 25 ..< 28;
 }

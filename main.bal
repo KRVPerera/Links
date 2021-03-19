@@ -35,27 +35,27 @@ service /links on new http:Listener(9090) {
     resource function post db(http:Caller caller, http:Request req) {
         var jsonMsg = req.getJsonPayload();
         if (jsonMsg is json) {
-            log:print(jsonMsg.toString());
+            log:printInfo(jsonMsg.toString());
             json|error nameString = jsonMsg.name;
 
             http:Response|error response;
             if (nameString is json) {
-                log:print("namestring is json");
+                log:printInfo("namestring is json");
                 if (nameString.toString() == "all") {
                     http:Response res = new;
                     res.statusCode = 200;
 
-                    log:print("Hit all request");
+                    log:printInfo("Hit all request");
 
                     if (linkdDbClient is jdbc:Client) {
                         json[] queryResult = db:getAllRecords(linkdDbClient);
-                        log:print("RECIEVED data from DB");
+                        log:printInfo("RECIEVED data from DB");
                         res.setPayload(queryResult);
                     }
 
                     var result1 = caller->respond(res);
                     if (result1 is error) {
-                        log:printError("Error sending response", err = result1);
+                        log:printError("Error sending response", 'error = result1);
                     }
 
                 } else {
@@ -64,7 +64,7 @@ service /links on new http:Listener(9090) {
                     res.setPayload("Invalid request");
                     var result2 = caller->respond(res);
                     if (result2 is error) {
-                        log:printError("Error sending response", err = result2);
+                        log:printError("Error sending response", 'error = result2);
                     }
                 }
             } else {
@@ -73,7 +73,7 @@ service /links on new http:Listener(9090) {
                 res.setPayload(<@untainted>nameString.message());
                 var result3 = caller->respond(res);
                 if (result3 is error) {
-                    log:printError("Error sending response", err = result3);
+                    log:printError("Error sending response", 'error = result3);
                 }
             }
         } else {
@@ -82,9 +82,9 @@ service /links on new http:Listener(9090) {
             res.setPayload(<@untainted>jsonMsg.message());
             var result4 = caller->respond(res);
             if (result4 is error) {
-                log:printError("Error sending response", err = result4);
+                log:printError("Error sending response", 'error = result4);
             } else {
-               log:print("no json pay load"); 
+               log:printInfo("no json pay load"); 
             }
         }
     }
@@ -96,14 +96,14 @@ service /links on new http:Listener(9090) {
     resource function post group(http:Caller caller, http:Request req) {
         var jsonMsg = req.getJsonPayload();
         if (jsonMsg is json) {
-            log:print(jsonMsg.toString());
+            log:printInfo(jsonMsg.toString());
             json|error groupName = jsonMsg.group;
 
             http:Response|error response;
             if (groupName is json) {
                 http:Response res = new;
                 
-                log:print("Hit group request");
+                log:printInfo("Hit group request");
 
                 if (linkdDbClient is jdbc:Client) {
                     json[] queryResult = db:getAllRecordsInGroup(linkdDbClient, groupName.toString());
@@ -113,7 +113,7 @@ service /links on new http:Listener(9090) {
 
                 var result = caller->respond(res);
                 if (result is error) {
-                    log:printError("Error sending response", err = result);
+                    log:printError("Error sending response", 'error = result);
                 }
             } else {
                 http:Response res = new;
@@ -121,7 +121,7 @@ service /links on new http:Listener(9090) {
                 res.setPayload(<@untainted>groupName.message());                
                 var result = caller->respond(res);
                 if (result is error) {
-                    log:printError("Error sending response", err = result);
+                    log:printError("Error sending response", 'error = result);
                 }
             }
         } else {
@@ -130,7 +130,7 @@ service /links on new http:Listener(9090) {
             res.setPayload(<@untainted>jsonMsg.message());            
             var result = caller->respond(res);
             if (result is error) {
-                log:printError("Error sending response", err = result);
+                log:printError("Error sending response", 'error = result);
             }
         } 
     }
