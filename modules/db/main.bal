@@ -20,9 +20,9 @@ connPool);
 # + return - Return Value Description  
 public function initializeLinksDb() returns sql:Error? {
     int|string|sql:Error? result = initializeLinksTable(linksDBClient);
-    if (result is int|string) {
+    if result is int|string {
         log:printInfo(result.toBalString());
-    } else if (result is sql:Error) {
+    } else if result is sql:Error {
         log:printError("Error occurred: ", 'error = result);
     }
 }
@@ -34,7 +34,7 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
 public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
     json[] output = [];
     sql:ParameterizedQuery query = `select * from Links`;
-    if (jdbcClient is jdbc:Client) {
+    if jdbcClient is jdbc:Client {
         stream<record { }, error> resultStream = jdbcClient->query(query);
 
         error? e = resultStream.forEach(function(record { } result) {
@@ -46,7 +46,7 @@ public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
                                             }
                                         });
 
-        if (e is error) {
+        if e is error {
             log:printError("ForEach operation on the stream failed!", 'error = e);
         }
     }
@@ -56,7 +56,7 @@ public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
 public function getAllRecordsInGroup(jdbc:Client|sql:Error jdbcClient, string group) returns json[] {
     json[] output = [];
     sql:ParameterizedQuery query = `select * from Links where groupName=${group}`;
-    if (jdbcClient is jdbc:Client) {
+    if jdbcClient is jdbc:Client {
         stream<record { }, error> resultStream = jdbcClient->query(query);
 
         error? e = resultStream.forEach(function(record { } result) {
@@ -68,7 +68,7 @@ public function getAllRecordsInGroup(jdbc:Client|sql:Error jdbcClient, string gr
                                             }
                                         });
 
-        if (e is error) {
+        if e is error {
             log:printError("ForEach operation on the stream failed!", 'error = e);
         }
     }
