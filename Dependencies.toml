@@ -1,22 +1,12 @@
 [[dependency]]
-org = "ballerina"
-name = "test"
-version = "0.0.0"
-
-[[dependency]]
-org = "ballerina"
-name = "io"
-version = "0.6.0-alpha5"
-
-[[dependency]]
 org = "ballerinax"
 name = "java.jdbc"
 version = "0.6.0-alpha5"
 
 [[dependency]]
 org = "ballerina"
-name = "observe"
-version = "0.9.0"
+name = "http"
+version = "1.1.0-alpha5"
 
 [[dependency]]
 org = "ballerina"
@@ -30,7 +20,17 @@ version = "1.1.0-alpha5"
 
 [[dependency]]
 org = "ballerina"
-name = "http"
-version = "1.1.0-alpha5"
+name = "test"
+version = "0.0.0"
+
+[[dependency]]
+org = "ballerina"
+name = "observe"
+version = "0.9.0"
+
+[[dependency]]
+org = "ballerina"
+name = "io"
+version = "0.6.0-alpha5"
 
 
