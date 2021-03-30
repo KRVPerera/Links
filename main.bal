@@ -20,11 +20,13 @@ public function main() returns error? {
 }
 
 service /links on new http:Listener(9090) {
-    resource function get all(http:Caller caller, http:Request req) {
+    resource function get all(http:Caller caller) {
         http:Response res = new;
         res.statusCode = 500;
-        res.setPayload("Asasd");
-        var x = caller->respond("sfs");
+        json[] queryResult = db:getAllRecords(linkdDbClient);
+        log:printInfo("RECIEVED data from DB");
+        _ = res.setPayload(queryResult);
+        var result3 = caller->respond(res);
     }
 
     @http:ResourceConfig {consumes: ["application/json"]}
