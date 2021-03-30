@@ -1,3 +1,15 @@
 Me,https://github.com/KRVPerera,personal
 MyIssues,https://github.com/ballerina-platform/ballerina-lang/issues/assigned/KRVPerera,ballerina
+MyOpenPRs,https://github.com/ballerina-platform/ballerina-lang/pulls?q=is%3Apr+is%3Aopen+sort%3Aupdated-desc+author%3AKRVPerera+,ballerina
 Home,http://localhost/~rukshanp/Ballerina/docs.html,daily_use
+New Doc,https://docs.google.com/document/d/1lZgUMGn1UtKoM9O1QLQJKSskGaNq4duv1hw3SsMt_-M/edit,writing
+Scratch,https://docs.google.com/document/d/1m3Nfso9R_B41Hky2OBdOkzbhbHwo9Z6iWy5VneMiPAY/edit,writing
+BBE,https://ballerina.io/learn/by-example/,ballerina
+Ballerina PPT,https://ballerina.io/lang-guide/Ballerina_Language_Presentation-2021-01-29.pdf,ballerina_docs
+Lang Repo,https://github.com/ballerina-platform/ballerina-lang,ballerina
+My Lang Repo,https://github.com/KRVPerera/ballerina-lang,ballerina
+Compiler FE PRs,https://github.com/ballerina-platform/ballerina-lang/pulls?q=is%3Apr+is%3Aopen+sort%3Aupdated-desc+label%3ATeam%2FCompilerFE,ballerina
+Spec Repo,https://github.com/ballerina-platform/ballerina-spec,ballerina
+Lang Proposals,https://github.com/ballerina-platform/ballerina-spec/tree/master/lang/proposals,ballerina
+Lang Libs,https://github.com/ballerina-platform/ballerina-spec/tree/master/lang/lib,ballerina
+Ballerina Parser Design,https://docs.google.com/document/d/1Wv1FJ6JJbGqje6bXSBuJI6fNPbikFd0CreS83JO93lk/edit#,ballerina_docs

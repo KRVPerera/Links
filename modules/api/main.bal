@@ -15,7 +15,7 @@ service /links on new http:Listener(8080) {
             json|error nameString = jsonMsg.name;
 
             http:Response|error response;
-            if (nameString is json) {
+            if nameString is json {
                 if (nameString.toString() == "all") {
                     http:Response res = new;
                     res.statusCode = 200;
