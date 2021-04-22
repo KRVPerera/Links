@@ -26,7 +26,7 @@ service /links on new http:Listener(9090) {
         json[] queryResult = db:getAllRecords(linkdDbClient);
         log:printInfo("RECIEVED data from DB");
         _ = res.setPayload(queryResult);
-        var result3 = caller->respond(res);
+        checkpanic caller->respond(res);
     }
 
     @http:ResourceConfig {consumes: ["application/json"]}

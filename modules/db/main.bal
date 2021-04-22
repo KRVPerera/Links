@@ -31,6 +31,10 @@ public function getLinksDbClient() returns jdbc:Client|sql:Error {
     return linksDBClient;
 }
 
+# Get all the records from `Links` table
+#
+# + jdbcClient - jdbc client connected to `Links` database
+# + return - all the records as a json array  
 public function getAllRecords(jdbc:Client|sql:Error jdbcClient) returns json[] {
     json[] output = [];
     sql:ParameterizedQuery query = `select * from Links`;
@@ -135,6 +139,4 @@ function deleteRecord(jdbc:Client jdbcClient, int generatedId) {
     } else {
         log:printError("Error occurred: ", 'error = result);
     }
-
-    object {public isolated function __iterator() returns object {public isolated function next() returns record {| int value; |}? ;} ;} objectResult = 25 ..< 28;
 }
