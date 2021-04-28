@@ -19,17 +19,19 @@ public function main() returns error? {
     io:println("Hello World!");
 }
 
+@http:ServiceConfig {cors: {allowOrigins: ["http://localhost:3000"]}}
 service /links on new http:Listener(9090) {
     resource function get all(http:Caller caller) {
         http:Response res = new;
-        res.statusCode = 500;
+        res.statusCode = 200;
         json[] queryResult = db:getAllRecords(linkdDbClient);
         log:printInfo("RECIEVED data from DB");
         _ = res.setPayload(queryResult);
         checkpanic caller->respond(res);
     }
 
-    @http:ResourceConfig {consumes: ["application/json"]}
+    @http:ResourceConfig {
+                cors: {allowOrigins: ["http://localhost:3000"]},consumes: ["application/json"]}
     resource function post db(http:Caller caller, http:Request req) returns error? {
         var jsonMsg = check req.getJsonPayload();
         log:printDebug(jsonMsg.toString());
@@ -73,8 +75,7 @@ service /links on new http:Listener(9090) {
     }
 
     @http:ResourceConfig {
-        // cors: {allowOrigins: ["*", "http://localhost:3000"]},
-        consumes: ["application/json"]}
+                cors: {allowOrigins: ["http://localhost:3000"]},consumes: ["application/json"]}
     resource function post group(http:Caller caller, http:Request req) {
         var jsonMsg = req.getJsonPayload();
         if jsonMsg is json {
